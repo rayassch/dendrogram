@@ -35,9 +35,11 @@ var svg = d3.select("svg"),
     height = +svg.attr("height"),
     g = svg.append("g").attr("transform", "translate(40,0)");
 
+//This creates the size and width of the string
 var tree = d3.cluster()
     .size([height, width - 160]);
 
+//This stratifies the dendrogram
 var stratify = d3.stratify()
     .parentId(function(d) { return d.id.substring(0, d.id.lastIndexOf(".")); });
 
@@ -46,9 +48,10 @@ d3.csv("flare.csv", function(error, data) {
 
   var root = stratify(data)
       .sort(function(a, b) { return (a.height - b.height) || a.id.localeCompare(b.id); });
-
+      //By commenting that line of code out it changes the way the dendrogram appears.
   tree(root);
 
+  //This is generating the linking lines between the nodes.
   var link = g.selectAll(".link")
       .data(root.descendants().slice(1))
     .enter().append("path")
@@ -60,15 +63,17 @@ d3.csv("flare.csv", function(error, data) {
             + " " + d.parent.y + "," + d.parent.x;
       });
 
+  
   var node = g.selectAll(".node")
       .data(root.descendants())
     .enter().append("g")
       .attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
 
+  //This is creating the node circles
   node.append("circle")
       .attr("r", 2.5);
-
+  
   node.append("text")
       .attr("dy", 3)
       .attr("x", function(d) { return d.children ? -8 : 8; })
